@@ -1,0 +1,33 @@
+:: Start
+Welcome to the adventure! Do you want to go to the forest, fight a monster, explore the cave, or stay in the village?
+
+[[Go to the forest|Forest]]
+[[Fight the monster|Monster]]
+[[Explore the cave|Cave]]
+[[Stay in the village|Village]]
+
+:: Forest
+You enter the forest and find a sword.
+
+(set: $hasSword to true)
+
+[[Return to the village|Village]]
+
+:: Monster
+You encounter a monster!
+
+(if: $hasSword)[You defeated the monster with your sword!](else:)[The monster injured you! You need a weapon to fight it.]
+
+[[Return to the village|Village]]
+
+:: Cave
+The cave is dark and you find a shield.
+
+(set: $hasShield to true)
+
+[[Return to the village|Village]]
+
+:: Village
+You are back in the village. What do you want to do?
+
+[[Go back to the

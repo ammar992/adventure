@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Adventure Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            background-color: #1abc9c;
+            width: 100%;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 2em;
+            color: #fff;
+        }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 20px;
+            padding: 20px;
+            background-color: #34495e;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .inventory, .stats, .map {
+            background-color: #16a085;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .passage {
+            display: none;
+            margin-top: 20px;
+        }
+       li a{
+            text-decoration: none;
+            color: white;
+        }
+        .passage a {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #e74c3c;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .passage a:hover {
+            background-color: #c0392b;
+        }
+        .passage a:active {
+            background-color: #e74c3c;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .gameover {
+            background-color: #e74c3c;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+        }
+        .gameover a {
+            background-color: #c0392b;
+        }
+    </style>
+    <script>
+        var inventory = [];
+        var health = 100;
+        var monsterAlive = true;
+
+        function showPassage(passageId) {
+            var passages = document.querySelectorAll('.passage');
+            passages.forEach(p => p.style.display = 'none');
+            document.getElementById(passageId).style.display = 'block';
+            updateStats();
+        }
+
+        function takeItem(item) {
+            if (!inventory.includes(item)) {
+                inventory.push(item);
+                alert('You have taken the ' + item + '!');
+                updateInventory();
+            } else {
+                alert('You already have the ' + item + '.');
+            }
+        }
+
+        function updateInventory() {
+            document.getElementById('inventory').innerHTML = "Inventory: " + (inventory.length ? inventory.join(', ') : 'None');
+        }
+
+        function updateStats() {
+            document.getElementById('stats').innerHTML = "Health: " + health;
+            if (health <= 0) {
+                showPassage('gameover');
+            }
+        }
+
+        function fightMonster() {
+            if (monsterAlive) {
+                if (inventory.includes('sword')) {
+                    alert('You defeated the monster with your sword!');
+                    monsterAlive = false;
+                    document.getElementById('monster').innerHTML = "The monster is defeated. You are victorious!<br>" +
+                                                                   "<a href='#' onclick='resetMonster(); showPassage(\"village\")'>Return to the village</a>";
+                } else {
+                    health -= 50;
+                    alert('The monster injured you! You need a weapon to fight it. Health is now ' + health);
+                    if (health <= 0) {
+                        showPassage('gameover');
+                    } else {
+                        document.getElementById('monster').innerHTML = "You are injured! Health is now " + health + ".<br>" +
+                                                                       "<a href='#' onclick='resetMonster(); showPassage(\"village\")'>Run back to the village</a>";
+                    }
+                    updateStats();
+                }
+            } else {
+                alert('The monster is already defeated.');
+                document.getElementById('monster').innerHTML = "The monster is defeated. You are victorious!<br>" +
+                                                               "<a href='#' onclick='resetMonster(); showPassage(\"village\")'>Return to the village</a>";
+            }
+        }
+
+        function resetMonster() {
+            monsterAlive = true;
+            document.getElementById('monster').innerHTML = "You encounter a monster!<br>" +
+                                                           "<a href='#' onclick='fightMonster()'>Fight the monster</a><br>" +
+                                                           "<a href='#' onclick='resetMonster(); showPassage(\"village\")'>Run back to the village</a>";
+        }
+
+        function heal() {
+            health = 100;
+            alert('You have healed to full health!');
+            updateStats();
+        }
+
+        function exploreCave() {
+            if (!inventory.includes('shield')) {
+                document.getElementById('cave').innerHTML = "The cave is dark and you find a shield.<br>" +
+                                                            "<a href='#' onclick='takeItem(\"shield\")'>Take the shield</a><br>" +
+                                                            "<a href='#' onclick='showPassage(\"village\")'>Return to the village</a>";
+            } else {
+                document.getElementById('cave').innerHTML = "The cave is empty. You've already taken the shield.<br>" +
+                                                            "<a href='#' onclick='showPassage(\"village\")'>Return to the village</a>";
+            }
+            showPassage('cave');
+        }
+
+        function resetGame() {
+            inventory = [];
+            health = 100;
+            monsterAlive = true;
+            updateInventory();
+            updateStats();
+            showPassage('start');
+        }
+
+        function addItem(item) {
+            if (!inventory.includes(item)) {
+                inventory.push(item);
+                alert('You have found a ' + item + '!');
+                updateInventory();
+            }
+        }
+    </script>
+</head>
+<body onload="showPassage('start')">
+
+    <header>Adventure Game</header>
+
+    <div class="container">
+        <div id="inventory" class="inventory">Inventory: None</div>
+        <div id="stats" class="stats">Health: 100</div>
+        <div id="map" class="map">
+            <h3>Map</h3>
+            <ul>
+                <li><a href="#" onclick="showPassage('forest')">Forest</a></li>
+                <li><a href="#" onclick="showPassage('monster')">Monster's Lair</a></li>
+                <li><a href="#" onclick="exploreCave()">Cave</a></li>
+                <li><a href="#" onclick="showPassage('village')">Village</a></li>
+            </ul>
+        </div>
+
+        <div id="start" class="passage">
+            Welcome to the adventure! Do you want to go to the forest, fight a monster, explore the cave, or stay in the village?<br>
+            <a href="#" onclick="showPassage('forest')">Go to the forest</a><br>
+            <a href="#" onclick="showPassage('monster')">Fight the monster</a><br>
+            <a href="#" onclick="exploreCave()">Explore the cave</a><br>
+            <a href="#" onclick="showPassage('village')">Stay in the village</a>
+        </div>
+        
+        <div id="forest" class="passage">
+            You enter the forest and find a sword.<br>
+            <a href="#" onclick="takeItem('sword')">Take the sword</a><br>
+            <a href="#" onclick="showPassage('village')">Return to the village</a>
+        </div>
+        
+        <div id="monster" class="passage">
+            You encounter a monster!<br>
+            <a href="#" onclick="fightMonster()">Fight the monster</a><br>
+            <a href="#" onclick="resetMonster(); showPassage('village')">Run back to the village</a>
+        </div>
+        
+        <div id="village" class="passage">
+            You are back in the village. What do you want to do?<br>
+            <a href="#" onclick="showPassage('forest')">Go back to the forest</a><br>
+            <a href="#" onclick="showPassage('monster')">Fight the monster</a><br>
+            <a href="#" onclick="exploreCave()">Explore the cave</a><br>
+            <a href="#" onclick="heal()">Heal</a><br>
+            <a href="#" onclick="resetGame()">Start over</a>
+        </div>
+
+        <div id="cave" class="passage">
+            The cave is dark and you find a shield.<br>
+            <a href="#" onclick="takeItem('shield')">Take the shield</a><br>
+            <a href="#" onclick="showPassage('village')">Return to the village</a>
+        </div>
+        
+        <div id="gameover" class="passage gameover">
+            Game Over! You have died.<br>
+            <a href="#" onclick="resetGame()">Restart</a>
+        </div>
+    </div>
+    
+</body>
+</html>
